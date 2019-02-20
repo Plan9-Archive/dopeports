@@ -9,7 +9,9 @@ fn getports {
 fn getportversion {
 	if(test -e $PORTS/$1){
 		if(test -e $PORTS/$1/mkfile){
-			cat $PORTS/$1/mkfile | grep 'VERSION=' | awk 'BEGIN { FS="=" } { print $2 }'
+			cat $PORTS/$1/mkfile | grep 'VERSION=' | 
+			awk 'BEGIN { FS="=" } { print $2 }' |
+			sed 's/\''//g'
 		}
 		if not {
 			echo '-1'
