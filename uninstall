@@ -1,0 +1,62 @@
+#!/bin/rc
+
+# dopeports/uninstall [ports...] -- uninstall a port
+
+rfork ne
+
+if(test -f /lib/dopeports.conf) {
+	. /lib/dopeports.conf
+}
+if not {
+	if(test -f $home/lib/dopeports.conf){
+		. $home/lib/dopeports.conf
+	}
+	if not {
+		if(test -f ./dopeports.conf){
+			. dopeports.conf
+		}
+		if not {
+			PORTS=/sys/ports
+			targetarches=(arm amd64 386)
+			dpbin=/bin/dopeports
+		}
+	}
+}
+. $dpbin/dplib.rc
+
+ohnoes = ''
+cpwd = `{ pwd }
+
+fn douninstall {
+	cd $PORTS/$1
+	mk uninstall || ohnoes = 'bad'
+	mk nuke
+	cd $cpwd
+}
+
+fn uninstallport {
+	ohnoes = ''
+	if(checkport $1){
+		echo -n 'uninstalling '^$1^'... '
+		pname = `{echo $1 | sed 's/\//\./g'}
+		douninstall $1 >'/tmp/uninstall-'^$pname^'-'^$objtype^'.log' >[2=1]
+		if(~ $ohnoes ''){
+			echo 'success'
+		}
+		if not {
+			echo 'failure'
+		}
+	}
+	if not {
+		echo $1^' is not installed'
+	}
+}
+
+if(~ $#* 0){
+	echo 'usage: dopeports/uninstall [ports...]'
+	exit 'usage'
+}
+
+for(pts in $*){
+	uninstallport $pts
+}

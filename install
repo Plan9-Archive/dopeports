@@ -1,0 +1,60 @@
+#!/bin/rc
+
+# dopeports/install [ports...] -- install a port
+
+rfork ne
+
+if(test -f /lib/dopeports.conf) {
+	. /lib/dopeports.conf
+}
+if not {
+	if(test -f $home/lib/dopeports.conf){
+		. $home/lib/dopeports.conf
+	}
+	if not {
+		if(test -f ./dopeports.conf){
+			. dopeports.conf
+		}
+		if not {
+			PORTS=/sys/ports
+			targetarches=(arm amd64 386)
+			dpbin=/bin/dopeports
+		}
+	}
+}
+
+ohnoes=''
+
+fn doinstall {
+	cd $PORTS
+	cd $1
+	mk nuke
+	mk install || ohnoes='bad install'
+	cd $PORTS
+}
+
+fn installport {
+	ohnoes=''
+	echo 'installing '^$1^'...'
+	pname = `{echo $1 | sed 's/\//\./g'}
+	for(i in $targetarches){
+		objtype=$i
+		echo -n ' > '^$objtype^'... '
+		doinstall $1 >'/tmp/install-'^$pname^'-'^$objtype^'.log' >[2=1]
+		if(~ $ohnoes '') {
+			echo 'success'
+		}
+		if not {
+			echo 'failure'
+		}
+	}
+}
+
+if(~ $#* 0){
+	echo 'usage: dopeports/install [ports...]'
+	exit 'usage'
+}
+
+for(pts in $*){
+	installport $pts
+}

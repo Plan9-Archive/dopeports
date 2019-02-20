@@ -1,0 +1,27 @@
+#!/bin/rc
+
+. $PORTS/Mk/npkg/npkg.rc
+
+fn getports {
+	awk -f $dpbin/getname.awk < $PORTS/Config/ports.ndb
+}
+
+fn getportversion {
+	if(test -e $PORTS/$1){
+		if(test -e $PORTS/$1/mkfile){
+			cat $PORTS/$1/mkfile | grep 'VERSION=' | awk 'BEGIN { FS="=" } { print $2 }'
+		}
+		if not {
+			echo '-1'
+		}
+	}
+	if not {
+		echo '-1'
+	}
+}
+
+fn getinstalledversion {
+	_rec = `{ getrecord name $1 }
+	_frec = `{ fmtrecord $"_rec }
+	echo $_frec(2)
+}

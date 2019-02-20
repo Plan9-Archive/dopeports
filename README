@@ -1,0 +1,29 @@
+dopeports -- tools to deal with ports
+
+installation
+	run dpinstaller. dp is normally installed to /rc/bin/dopeports
+
+configuration
+	By default dp will look for it's stuff in /bin/dopeports, use the
+	ports tree at /sys/ports, and will install ports for arm, amd64,
+	and 386.  If you need to configure any of this take the example
+	config file, edit it, and place it at either /lib/dopeports.conf
+	or $home/lib/dopeports.conf.
+
+dopeports/install [ports...]
+	This program takes a list of ports and installs them for
+	$targetarches.
+
+dopeports/uninstall [ports...]
+	Same as install, but uninstalls the ports.
+
+dopeports/status
+	Gives you a rough estimate of what ports need updating.
+
+dopeports/update
+	Takes the list of ports from status and updates them by first uninstalling a port then reinstalling the port for all architectures.
+
+other files
+	getname.awk extracts the port name from the ndb database
+	dplib.rc contains helper functions used by dp.
+	dpinstaller installs dp

@@ -1,0 +1,65 @@
+#!/bin/rc
+
+# dopeports/status -- shows which ports need updating
+
+rfork ne
+
+if(test -f /lib/dopeports.conf) {
+	. /lib/dopeports.conf
+}
+if not {
+	if(test -f $home/lib/dopeports.conf){
+		. $home/lib/dopeports.conf
+	}
+	if not {
+		if(test -f ./dopeports.conf){
+			. dopeports.conf
+		}
+		if not {
+			PORTS=/sys/ports
+			targetarches=(arm amd64 386)
+			dpbin=/bin/dopeports
+		}
+	}
+}
+
+. $dpbin/dplib.rc
+
+ports = `{ getports }
+needupdates = 'no'
+
+if(~ $#ports 0){
+	echo 'no ports installed'
+	exit 'no ports'
+}
+
+if(~ $1 'script'){
+	noprint = 'yes'
+}
+
+for(i in $ports){
+	ivers = `{ getinstalledversion $i }
+	pvers = `{ getportversion $i }
+	if(~ $pvers '-1'){
+		if(! ~ $noprint 'yes') {
+			echo 'missing '^$i
+			needupdates = 'yes'
+		}
+	}
+	if not {
+		if(! ~ $ivers $pvers) {
+			if(! ~ $noprint 'yes'){
+				echo 'update '^$i^' ('^$ivers^' -> '^$pvers^')'
+				needupdate = 'yes'
+			}
+			if not {
+				echo $i
+			}
+		}
+	}
+}
+if(~ $needupdate 'no'){
+	if(! ~ $noprint 'yes'){
+		echo 'no ports need updating'
+	}
+}

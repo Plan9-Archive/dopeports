@@ -1,0 +1,33 @@
+#!/bin/rc
+
+# dopeports/update -- update your ports
+
+rfork ne
+
+if(test -f /lib/dopeports.conf) {
+	. /lib/dopeports.conf
+}
+if not {
+	if(test -f $home/lib/dopeports.conf){
+		. $home/lib/dopeports.conf
+	}
+	if not {
+		if(test -f ./dopeports.conf){
+			. dopeports.conf
+		}
+		if not {
+			PORTS=/sys/ports
+			targetarches=(arm amd64 386)
+			dpbin=/bin/dopeports
+		}
+	}
+}
+. $dpbin/dplib.rc
+
+nports = `{ $dpbin/status script }
+for(p in $nports){
+	echo '>>> updating '^$p^'...'
+	$dpbin/uninstall $p
+	$dpbin/install $p
+}
+echo 'complete.'

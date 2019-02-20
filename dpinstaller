@@ -1,0 +1,20 @@
+#!/bin/rc
+
+files=(dplib.rc getname.awk dopeports.conf install status uninstall update README)
+execs=(install status uninstall update)
+installdir=/rc/bin/dopeports
+
+if(! ~ $#1 0){
+	installdir=$1
+}
+
+echo 'installing dopeports to '^$installdir
+mkdir $installdir
+for(i in $files){
+	echo 'cp '^$i^' '^$installdir
+	cp $i $installdir
+}
+for(j in $execs){
+	echo 'chmod +x '^$installdir^'/'^$j
+	chmod +x $installdir/$j
+}
